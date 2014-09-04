@@ -1,78 +1,53 @@
-Django on OpenShift
-===================
+Django v1.65 on OpenShift v3.2014
+=
+This git repository helps you get up and running quickly with django v1.65 and Openshift March 2014 release.
+###Features
+* Ready to use for local development
+* Easy to push to Openshift
+* Configured for PostgreSQL 9.2
+* Minimal changes to default django 1.6x installation
+* Names follow the django 1.6x tutorial
+* Uses new folder layout from Openshift March 2014 release
+* Allows for debug mode on Openshift with the help of an environment variable.
 
-This git repository helps you get up and running quickly w/ a Django
-installation on OpenShift.  The Django project name used in this repo
-is 'openshift' but you can feel free to change it.  Right now the
-backend is sqlite3 and the database runtime is found in
-`$OPENSHIFT_DATA_DIR/sqlite3.db`.
-
-Before you push this app for the first time, you will need to change
-the [Django admin password](#admin-user-name-and-password).
-Then, when you first push this
-application to the cloud instance, the sqlite database is copied from
-`wsgi/openshift/sqlite3.db` with your newly changed login
-credentials. Other than the password change, this is the stock
-database that is created when `python manage.py syncdb` is run with
-only the admin app installed.
-
-On subsequent pushes, a `python manage.py syncdb` is executed to make
-sure that any models you added are created in the DB.  If you do
-anything that requires an alter table, you could add the alter
-statements in `GIT_ROOT/.openshift/action_hooks/alter.sql` and then use
-`GIT_ROOT/.openshift/action_hooks/deploy` to execute that script (make
-sure to back up your database w/ `rhc app snapshot save` first :) )
-
-You can also turn on the DEBUG mode for Django application using the
-`rhc env set DEBUG=True --app APP_NAME`. If you do this, you'll get
-nicely formatted error pages in browser for HTTP 500 errors.
-
-Do not forget to turn this environment variable off and fully restart
-the application when you finish:
-
+###How to use this repository
+- Create an account at https://www.openshift.com
+- Install the RHC client tools if you have not already done so.
 ```
-$ rhc env unset DEBUG
-$ rhc app stop && rhc app start
+sudo gem install rhc
+rhc setup
+```
+- Create a Python 2.7 application
+```
+rhc app create django python-2.7
+```
+- Add the PostgreSQL 9.2 cartridge
+```
+rhc add-cartridge postgresql-9.2 --app django
+```
+- Add this upstream repo
+```
+cd django
+git remote add upstream -m master https://github.com/jfmatth/openshift-django16.git
+git pull -s recursive -X theirs upstream master
+```
+- Push the repo upstream
+```
+git push
+```
+- SSH into the application to create a django superuser
+```
+python app-root/repo/manage.py createsuperuser
 ```
 
-Running on OpenShift
---------------------
+### Configuration details
+When a git push is done, the .openshift/action_hooks/deploy is executed.  This script does two things:
 
-Create an account at https://www.openshift.com
+1.  Runs python manage.py syncdb to update any changes to the Schema
+2.  Runs python manage.py collectstatic to move all necessary static files into /wsgi/static
 
-Install the RHC client tools if you have not already done so:
-    
-    sudo gem install rhc
-    rhc setup
+#### Debugging mode and Openshift
+By default, debug mode is off when pushed to Openshift.  However, if you'd like to turn on debugging (settings.DEBUG) while running on Openshift, you can set the environment variable DEBUG to True and then stop and start your application, and debugging will be turned on.
 
-Create a python application
-
-    rhc app create django python-2.6
-
-Add this upstream repo
-
-    cd django
-    git remote add upstream -m master git://github.com/openshift/django-example.git
-    git pull -s recursive -X theirs upstream master
-
-Then push the repo upstream
-
-    git push
-
-Here, the [admin user name and password will be displayed](#admin-user-name-and-password), so pay
-special attention.
-	
-That's it. You can now checkout your application at:
-
-    http://django-$yournamespace.rhcloud.com
-
-Admin user name and password
-----------------------------
-As the `git push` output scrolls by, keep an eye out for a
-line of output that starts with `Django application credentials: `. This line
-contains the generated admin password that you will need to begin
-administering your Django app. This is the only time the password
-will be displayed, so be sure to save it somewhere. You might want 
-to pipe the output of the git push to a text file so you can grep for
-the password later.
+``` rhc env set DEBUG=True```
 
