@@ -78,6 +78,6 @@ class Funcionario(models.Model):
     # "123456"
     documento = models.IntegerField(primary_key=True)
     # "Juan Perez"
-    funcionario = models.CharField(128)
+    funcionario = models.CharField(max_length=128)
     # 123415
     nro_matriculacion = models.IntegerField(unique=True)
