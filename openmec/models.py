@@ -9,31 +9,36 @@ class ObjetoGasto(models.Model):
 
 
 MES = (
-    (1, 'Enero'),
-    (2, 'Febrero'),
-    (3, 'Marzo'),
-    (4, 'Abril'),
-    (5, 'Mayo'),
-    (6, 'Junio'),
-    (7, 'Julio'),
-    (8, 'Agosto'),
-    (9, 'Setiembre'),
-    (10, 'Octubre'),
-    (11, 'Noviembre'),
-    (12, 'Diciembre'),
+    (1, 'enero'),
+    (2, 'febrero'),
+    (3, 'marzo'),
+    (4, 'abril'),
+    (5, 'mayo'),
+    (6, 'junio'),
+    (7, 'julio'),
+    (8, 'agosto'),
+    (9, 'setiembre'),
+    (10, 'octubre'),
+    (11, 'noviembre'),
+    (12, 'diciembre'),
 )
 
 
+
 class Dependencia(models.Model):
+    # This field may not exist in the pdf
     # "16014"
-    codigo = models.CharField(max_length=30, primary_key=True)
+    # codigo = models.CharField(max_length=30, primary_key=True)
+
     # ESC. BAS. 295 PANAMERICANA
-    institucion = models.CharField(max_length=128)
+    institucion = models.CharField(max_length=128, primary_key=True)
 
 
 class Cargo(models.Model):
+    # This field may not exist in the pdf
     # "50420"
-    codigo = models.CharField(max_length=30, primary_key=True)
+    # codigo = models.CharField(max_length=30, primary_key=True)
+
     # "Catedratico de Lengua Guarani"
     cargo = models.CharField(max_length=128)
 
@@ -46,10 +51,8 @@ class Rubro(models.Model):
 
 
 class Concepto(models.Model):
-    # "1111000"
-    codigo = models.CharField(max_length=30, primary_key=True)
     # "Sueldos"
-    concepto = models.CharField(max_length=128)
+    concepto = models.CharField(max_length=128, primary_key=True)
     # valor calculado
     minimo = models.IntegerField()
     # valor calculado
@@ -59,12 +62,13 @@ class Concepto(models.Model):
 
 class Funcionario(models.Model):
     # "123456"
-    documento = models.IntegerField(primary_key=True)
+    documento = models.CharField(max_length=30, primary_key=True)
     # "Juan Perez"
     funcionario = models.CharField(max_length=128)
     # 123415
-    nro_matriculacion = models.IntegerField(unique=True)
-
+    nro_matriculacion = models.IntegerField()
+    class Meta:
+        ordering = ('funcionario',)
 
 class Datos(models.Model):
     id = models.AutoField(primary_key=True)
@@ -72,11 +76,11 @@ class Datos(models.Model):
     mes = models.IntegerField(choices=MES)
     # 2014
     anio = models.IntegerField()
-    funcionario = models.ForeignKey("Funcionario")
+    funcionario = models.ForeignKey("Funcionario", related_name='datos')
     # "Permanente"
     estado = models.CharField(max_length=30)
-    objeto_gasto = models.ForeignKey("ObjetoGasto")
-    concepto = models.ForeignKey("Concepto")
-    dependencia = models.ForeignKey("Dependencia")
-    cargo = models.ForeignKey("Cargo")
-    rubro = models.ForeignKey("Rubro")
+    objeto_gasto = models.ForeignKey("ObjetoGasto", null=True, related_name='datos')
+    concepto = models.ForeignKey("Concepto", null=True, related_name='datos')
+    dependencia = models.ForeignKey("Dependencia", null=True, related_name='datos')
+    cargo = models.ForeignKey("Cargo", null=True, related_name='datos')
+    rubro = models.ForeignKey("Rubro", null=True, related_name='datos')
