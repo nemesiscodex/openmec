@@ -5,6 +5,9 @@
     <title></title>
 </head>
 <body>
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
 {% for file in file_list %}
     <form method="post">
     {% csrf_token %}

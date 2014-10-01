@@ -1,3 +1,7 @@
+# import the logging library
+import logging
+from threading import Thread
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -8,6 +12,9 @@ from openmec.serializers import FuncionarioSerializer
 from openmec.utils import handle_uploaded_file, get_file_list, data_save
 from django.contrib.auth.decorators import login_required
 
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 class JSONResponse(HttpResponse):
     """
@@ -45,10 +52,26 @@ def upload_file(request):
         form = UploadFileForm()
     return render_to_response('upload.html',  context_instance=RequestContext(request, {'form': form}))
 
+
+def save_wrapper(filename):
+
+    try:
+        data_save(filename)
+    except Exception as e:
+        logger.error("The csv file {0} could not be saved.".format(filename))
+        logger.error(e)
+    else:
+        logger.info("The file was saved")
+
+
 @login_required
 def files(request):
+    message = ''
     if request.method == 'POST':
         filename = request.POST.get('filename')
-        data_save(filename)
+        thread_csv = Thread(target=save_wrapper, args=(filename,))
+        thread_csv.start()
+        message = 'Procesando Archivo.'
     file_list = get_file_list()
-    return render_to_response('files.html',  context_instance=RequestContext(request, {'file_list': file_list}))
+    return render_to_response('files.html',  context_instance=RequestContext(request, {'file_list': file_list,
+                                                                                       'message':message}))
