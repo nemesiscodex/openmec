@@ -29,7 +29,7 @@ def data_save(filename):
     :param filename:
     :return:
     """
-    with open('csv/'+filename, 'r+') as csv_file:
+    with open(os.path.join(os.path.join(settings.BASE_DIR, 'csv'), filename), 'r+') as csv_file:
         first = True
         for line in csv_file:
             if not first:
