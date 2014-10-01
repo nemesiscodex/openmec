@@ -69,8 +69,9 @@ def files(request):
     message = ''
     if request.method == 'POST':
         filename = request.POST.get('filename')
-        thread_csv = Thread(target=save_wrapper, args=(filename,))
-        thread_csv.start()
+        save_wrapper(filename)
+        # thread_csv = Thread(target=save_wrapper, args=(filename,))
+        # thread_csv.start()
         message = 'Procesando Archivo.'
     file_list = get_file_list()
     return render_to_response('files.html',  context_instance=RequestContext(request, {'file_list': file_list,
