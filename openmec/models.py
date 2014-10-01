@@ -30,14 +30,14 @@ class Datos(models.Model):
     mes = models.IntegerField(choices=MES)
     # 2014
     anio = models.IntegerField()
-    funcionario = models.ManyToManyField("Funcionario")
+    funcionario = models.ForeignKey("Funcionario")
     # "Permanente"
     estado = models.CharField(max_length=30)
-    objeto_gasto = models.ManyToManyField("ObjetoGasto")
-    concepto = models.ManyToManyField("Concepto")
-    dependencia = models.ManyToManyField("Dependencia")
-    cargo = models.ManyToManyField("Cargo")
-    rubro = models.ManyToManyField("Rubro")
+    objeto_gasto = models.ForeignKey("ObjetoGasto")
+    concepto = models.ForeignKey("Concepto")
+    dependencia = models.ForeignKey("Dependencia")
+    cargo = models.ForeignKey("Cargo")
+    rubro = models.ForeignKey("Rubro")
 
 
 
