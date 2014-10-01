@@ -14,7 +14,7 @@ def handle_uploaded_file(f, title):
             print line.replace('\n','').split(";")
 
 def get_file_list():
-    return [file for file in os.path.join(settings.BASE_DIR,'csv') if file.endswith('.csv')]
+    return [file for file in os.listdir(os.path.join(settings.BASE_DIR,'csv')) if file.endswith('.csv')]
 
 
 def load_data(filename):
