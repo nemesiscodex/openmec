@@ -36,6 +36,7 @@ class ConceptoSerializer(serializers.ModelSerializer):
 
 
 class DatosSerializer(serializers.ModelSerializer):
+
     objeto_gasto = ObjetoGastoSerializer()
     concepto = ConceptoSerializer()
     dependencia = DependenciaSerializer()
@@ -43,6 +44,7 @@ class DatosSerializer(serializers.ModelSerializer):
     rubro = RubroSerializer()
 
     class Meta:
+        depth = 1
         model = Datos
         fields = ('id', 'mes', 'anio', 'estado', 'objeto_gasto',
                   'concepto', 'dependencia', 'cargo', 'rubro')
