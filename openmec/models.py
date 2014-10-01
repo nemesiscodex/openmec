@@ -24,23 +24,6 @@ MES = (
 )
 
 
-class Datos(models.Model):
-    id = models.AutoField(primary_key=True)
-    # 8 (Agosto)
-    mes = models.IntegerField(choices=MES)
-    # 2014
-    anio = models.IntegerField()
-    funcionario = models.ForeignKey("Funcionario")
-    # "Permanente"
-    estado = models.CharField(max_length=30)
-    objeto_gasto = models.ForeignKey("ObjetoGasto")
-    concepto = models.ForeignKey("Concepto")
-    dependencia = models.ForeignKey("Dependencia")
-    cargo = models.ForeignKey("Cargo")
-    rubro = models.ForeignKey("Rubro")
-
-
-
 class Dependencia(models.Model):
     # "16014"
     codigo = models.CharField(max_length=30, primary_key=True)
@@ -81,3 +64,19 @@ class Funcionario(models.Model):
     funcionario = models.CharField(max_length=128)
     # 123415
     nro_matriculacion = models.IntegerField(unique=True)
+
+
+class Datos(models.Model):
+    id = models.AutoField(primary_key=True)
+    # 8 (Agosto)
+    mes = models.IntegerField(choices=MES)
+    # 2014
+    anio = models.IntegerField()
+    funcionario = models.ForeignKey("Funcionario")
+    # "Permanente"
+    estado = models.CharField(max_length=30)
+    objeto_gasto = models.ForeignKey("ObjetoGasto")
+    concepto = models.ForeignKey("Concepto")
+    dependencia = models.ForeignKey("Dependencia")
+    cargo = models.ForeignKey("Cargo")
+    rubro = models.ForeignKey("Rubro")

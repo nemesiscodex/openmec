@@ -4,19 +4,6 @@ CREATE TABLE "openmec_objetogasto" (
     "nombre" varchar(128) NOT NULL
 )
 ;
-CREATE TABLE "openmec_datos" (
-    "id" integer NOT NULL PRIMARY KEY,
-    "mes" integer NOT NULL,
-    "anio" integer NOT NULL,
-    "funcionario_id" integer NOT NULL,
-    "estado" varchar(30) NOT NULL,
-    "objeto_gasto_id" varchar(30) NOT NULL REFERENCES "openmec_objetogasto" ("codigo"),
-    "concepto_id" varchar(30) NOT NULL,
-    "dependencia_id" varchar(30) NOT NULL,
-    "cargo_id" varchar(30) NOT NULL,
-    "rubro_id" varchar(30) NOT NULL
-)
-;
 CREATE TABLE "openmec_dependencia" (
     "codigo" varchar(30) NOT NULL PRIMARY KEY,
     "institucion" varchar(128) NOT NULL
@@ -44,6 +31,19 @@ CREATE TABLE "openmec_funcionario" (
     "documento" integer NOT NULL PRIMARY KEY,
     "funcionario" varchar(128) NOT NULL,
     "nro_matriculacion" integer NOT NULL UNIQUE
+)
+;
+CREATE TABLE "openmec_datos" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "mes" integer NOT NULL,
+    "anio" integer NOT NULL,
+    "funcionario_id" integer NOT NULL REFERENCES "openmec_funcionario" ("documento"),
+    "estado" varchar(30) NOT NULL,
+    "objeto_gasto_id" varchar(30) NOT NULL REFERENCES "openmec_objetogasto" ("codigo"),
+    "concepto_id" varchar(30) NOT NULL REFERENCES "openmec_concepto" ("codigo"),
+    "dependencia_id" varchar(30) NOT NULL REFERENCES "openmec_dependencia" ("codigo"),
+    "cargo_id" varchar(30) NOT NULL REFERENCES "openmec_cargo" ("codigo"),
+    "rubro_id" varchar(30) NOT NULL REFERENCES "openmec_rubro" ("codigo")
 )
 ;
 CREATE INDEX "openmec_datos_22ee2d5e" ON "openmec_datos" ("funcionario_id");
