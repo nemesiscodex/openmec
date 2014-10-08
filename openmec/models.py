@@ -44,6 +44,8 @@ class Cargo(models.Model):
 
 
 class Rubro(models.Model):
+    anio = models.IntegerField()
+    mes = models.IntegerField()
     # "Z51"
     codigo = models.CharField(max_length=30, primary_key=True)
     # 16750
@@ -51,6 +53,8 @@ class Rubro(models.Model):
 
 
 class Concepto(models.Model):
+    mes = models.IntegerField()
+    anio = models.IntegerField()
     # "Sueldos"
     concepto = models.CharField(max_length=128, primary_key=True)
     # valor calculado

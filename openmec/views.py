@@ -1,7 +1,8 @@
 # import the logging library
 import logging
+from rest_framework.pagination import PaginationSerializer
 from django.contrib.sites.models import get_current_site
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -28,14 +29,35 @@ class JSONResponse(HttpResponse):
         super(JSONResponse, self).__init__(content, **kwargs)
 
 
-def funcionario_list(request):
+def funcionario_list(request, anio, mes):
+    mes = next(value for value, name in MES if name == mes)
     funcionarios = Funcionario.objects.all()
-    serializer = FuncionarioSerializer(funcionarios, many=True)
+    page = request.GET.get('page')
+    size = request.GET.get('size')
+    if type(size) != type(0):
+        size = 5
+
+    request.session['anio'] = anio
+    request.session['mes'] = mes
+
+    paginator = Paginator(funcionarios, size)
+    try:
+        funcionarios = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        funcionarios = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        funcionarios = paginator.page(paginator.num_pages)
+    # serializer = FuncionarioSerializer(funcionarios, many=True)
+    serializer = PaginatedFuncionarioSerializer(funcionarios, context={'request': request})
     return JSONResponse(serializer.data)
 
-def funcionario(request, documento):
+def funcionario(request, documento, anio, mes):
     try:
-        funcionario = Funcionario.objects.get(documento=documento)
+
+        mes = next(value for value, name in MES if name == mes)
+        funcionario = Funcionario.objects.get(documento=documento, anio=anio, mes=mes)
     except Funcionario.DoesNotExist:
         return HttpResponse(status=404)
     serializer = FuncionarioSerializer(funcionario)
@@ -43,6 +65,7 @@ def funcionario(request, documento):
 
 
 def objeto_gasto_list(request):
+
     objeto_gasto = ObjetoGasto.objects.all()
     serializer = ObjetoGastoSerializer(objeto_gasto, many=True)
     return JSONResponse(serializer.data)
@@ -57,9 +80,11 @@ def objeto_gasto(request, codigo):
     return JSONResponse(serializer.data)
 
 
-def rubro(request, codigo):
+def rubro(request, codigo, anio, mes):
     try:
-        rubro = Rubro.objects.get(codigo=codigo)
+
+        mes = next(value for value, name in MES if name == mes)
+        rubro = Rubro.objects.get(codigo=codigo, anio=anio, mes=mes)
     except Rubro.DoesNotExist:
         return HttpResponse(status=404)
     serializer = RubroSerializer(rubro)
@@ -78,26 +103,46 @@ def cargo_list(request):
     return JSONResponse(serializer.data)
 
 
-def rubro_list(request):
-    rubro = Rubro.objects.all()
+def rubro_list(request, anio, mes):
+
+    mes = next(value for value, name in MES if name == mes)
+    rubro = Rubro.objects.all().filter(anio=anio, mes=mes)
     serializer = RubroSerializer(rubro, many=True)
     return JSONResponse(serializer.data)
 
 
-def concepto_list(request):
-    concepto = Concepto.objects.all()
+def concepto_list(request, anio, mes):
+
+    mes = next(value for value, name in MES if name == mes)
+    concepto = Concepto.objects.all().filter(anio=anio, mes=mes)
     serializer = ConceptoSerializer(concepto, many=True)
     return JSONResponse(serializer.data)
 
 
 def home(request):
     urls = {}
-    urls['funcionario'] = 'http://'+get_current_site(request).domain+reverse('funcionario_list')
+    anios = [2014]
+    meses = ['junio', 'julio', 'agosto']
+    urls['funcionario'] = []
+    urls['objeto_gasto'] = []
+    urls['rubro'] = []
+    urls['concepto'] = []
+    for anio in anios:
+        for mes in meses:
+            urls['funcionario'].append('http://'+get_current_site(request).domain+reverse('funcionario_list',
+                                                                                          kwargs={'anio': anio,
+                                                                                                  'mes': mes}))
+
+            urls['rubro'].append('http://'+get_current_site(request).domain+reverse('rubro_list',
+                                                                                    kwargs={'anio': anio,
+                                                                                            'mes': mes}))
+            urls['concepto'].append('http://'+get_current_site(request).domain+reverse('concepto_list',
+                                                                                       kwargs={'anio':  anio,
+                                                                                               'mes': mes}))
+
     urls['objeto_gasto'] = 'http://'+get_current_site(request).domain+reverse('objeto_gasto_list')
     urls['dependencia'] = 'http://'+get_current_site(request).domain+reverse('dependencia_list')
     urls['cargo'] = 'http://'+get_current_site(request).domain+reverse('cargo_list')
-    urls['rubro'] = 'http://'+get_current_site(request).domain+reverse('rubro_list')
-    urls['concepto'] = 'http://'+get_current_site(request).domain+reverse('concepto_list')
 
     return JSONResponse(urls)
 
@@ -133,6 +178,8 @@ def files(request):
         # thread_csv = Thread(target=save_wrapper, args=(filename,))
         # thread_csv.start()
         message = 'Procesando Archivo.'
+    file_list = get_file_list()
+    for_all_files(file_list)
     file_list = get_file_list()
     return render_to_response('files.html',  context_instance=RequestContext(request, {'file_list': file_list,
                                                                                        'message':message}))

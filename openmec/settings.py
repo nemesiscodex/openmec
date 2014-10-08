@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'openmec.wsgi.application'
 if ON_PAAS:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',  
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME':     os.environ['OPENSHIFT_APP_NAME'],
             'USER':     os.environ['OPENSHIFT_POSTGRESQL_DB_USERNAME'],
             'PASSWORD': os.environ['OPENSHIFT_POSTGRESQL_DB_PASSWORD'],
@@ -94,10 +94,19 @@ if ON_PAAS:
     }
 else:
     # stock django
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     }
+    # }
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME':     'openmec',
+            'USER':     'postgres',
+            'PASSWORD': '12345',
+            'HOST':     'localhost',
         }
     }
 

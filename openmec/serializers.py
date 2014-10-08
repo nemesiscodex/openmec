@@ -1,5 +1,6 @@
 
 from rest_framework import serializers
+from rest_framework.pagination import PaginationSerializer
 from openmec.models import *
 
 
@@ -52,7 +53,26 @@ class DatosSerializer(serializers.ModelSerializer):
 
 
 class FuncionarioSerializer(serializers.ModelSerializer):
-    datos = DatosSerializer(many=True, blank=True)
+
+    datos = serializers.SerializerMethodField('get_datos')
+    # datos = DatosSerializer(many=True, blank=True)
+
+    def get_datos(self, obj):
+        session = self.context['request'].session
+        anio = int(session['anio'])
+        mes = session['mes']
+        datos = Datos.objects.filter(funcionario=obj, mes=mes, anio=anio)
+        serializer = DatosSerializer(datos, many=True, blank=True)
+        return serializer.data
+
     class Meta:
         model = Funcionario
         fields = ('documento', 'funcionario', 'nro_matriculacion', 'datos')
+
+
+class PaginatedFuncionarioSerializer(PaginationSerializer):
+    """
+    Serializes page objects of user querysets.
+    """
+    class Meta:
+        object_serializer_class = FuncionarioSerializer

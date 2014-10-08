@@ -1,6 +1,7 @@
 from django.db import transaction
 from openmec import settings
 import os
+import gc
 from openmec.models import *
 
 
@@ -22,6 +23,15 @@ def load_data(filename):
         for line in csv_file:
             row = line.replace('\n', '')
 
+
+def for_all_files(files):
+    for filename in files:
+        data_save(filename)
+        os.remove(os.path.join(os.path.join(settings.BASE_DIR, 'csv'), filename))
+        # Garbage Collector
+        gc.collect()
+
+
 @transaction.atomic
 def data_save(filename):
     """
@@ -29,7 +39,8 @@ def data_save(filename):
     :param filename:
     :return:
     """
-    with open(os.path.join(os.path.join(settings.BASE_DIR, 'csv'), filename), 'r+') as csv_file:
+    file_path = os.path.join(os.path.join(settings.BASE_DIR, 'csv'), filename)
+    with open(file_path, 'r') as csv_file:
         first = True
         for line in csv_file:
             if not first:
@@ -102,12 +113,14 @@ def data_save(filename):
                 monto_rubro = row[12].strip()
                 rubro_bd = None
                 if rubro != '':
-                    if Rubro.objects.filter(codigo=rubro).exists():
+                    if Rubro.objects.filter(codigo=rubro, mes=mes, anio=anio).exists():
                         rubro_bd = Rubro.objects.get(codigo=rubro)
                     else:
                         rubro_bd = Rubro()
                         rubro_bd.codigo = rubro
                         rubro_bd.monto = int(monto_rubro)
+                        rubro_bd.mes = mes
+                        rubro_bd.anio = anio
                         rubro_bd.save()
 
                 cantidad = int(row[13].strip())
@@ -117,7 +130,7 @@ def data_save(filename):
                 concepto = row[7].strip()
                 concepto_bd = None
                 if concepto != '':
-                    if Concepto.objects.filter(concepto=concepto).exists():
+                    if Concepto.objects.filter(concepto=concepto, mes=mes, anio=anio).exists():
                         concepto_bd = Concepto.objects.get(concepto=concepto)
                         if concepto_bd.maximo < asignacion:
                             concepto_bd.maximo = asignacion
@@ -131,6 +144,8 @@ def data_save(filename):
                         concepto_bd.minimo = asignacion
                         concepto_bd.maximo = asignacion
                         concepto_bd.promedio = asignacion
+                        concepto_bd.mes = mes
+                        concepto_bd.anio = anio
                         concepto_bd.save()
 
 
