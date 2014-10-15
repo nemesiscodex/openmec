@@ -30,8 +30,16 @@ class JSONResponse(HttpResponse):
 
 
 def funcionario_list(request, anio, mes):
+
+    documento = request.GET.get('documento')
+    nombre = request.GET.get('nombre')
+
     mes = next(value for value, name in MES if name == mes)
     funcionarios = Funcionario.objects.all()
+    if documento is not None:
+        funcionarios = funcionarios.filter(documento=documento)
+    if nombre is not None:
+        funcionarios = funcionarios.filter(funcionario__icontains=nombre)
     page = request.GET.get('page')
     size = request.GET.get('size')
     if type(size) != type(0):
@@ -133,13 +141,8 @@ def home(request):
                                                                                           kwargs={'anio': anio,
                                                                                                   'mes': mes}))
 
-            urls['rubro'].append('http://'+get_current_site(request).domain+reverse('rubro_list',
-                                                                                    kwargs={'anio': anio,
-                                                                                            'mes': mes}))
-            urls['concepto'].append('http://'+get_current_site(request).domain+reverse('concepto_list',
-                                                                                       kwargs={'anio':  anio,
-                                                                                               'mes': mes}))
-
+    urls['rubro'].append('http://'+get_current_site(request).domain+reverse('rubro_list'))
+    urls['concepto'].append('http://'+get_current_site(request).domain+reverse('concepto_list'))
     urls['objeto_gasto'] = 'http://'+get_current_site(request).domain+reverse('objeto_gasto_list')
     urls['dependencia'] = 'http://'+get_current_site(request).domain+reverse('dependencia_list')
     urls['cargo'] = 'http://'+get_current_site(request).domain+reverse('cargo_list')

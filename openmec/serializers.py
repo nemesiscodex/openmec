@@ -33,7 +33,7 @@ class RubroSerializer(serializers.ModelSerializer):
 class ConceptoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Concepto
-        fields = ('concepto', 'minimo', 'maximo', 'promedio')
+        fields = ('concepto',)
 
 
 class DatosSerializer(serializers.ModelSerializer):
