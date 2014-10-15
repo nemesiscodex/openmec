@@ -143,11 +143,14 @@ def home(request):
 
     urls['rubro'].append('http://'+get_current_site(request).domain+reverse('rubro_list'))
     urls['concepto'].append('http://'+get_current_site(request).domain+reverse('concepto_list'))
-    urls['objeto_gasto'] = 'http://'+get_current_site(request).domain+reverse('objeto_gasto_list')
-    urls['dependencia'] = 'http://'+get_current_site(request).domain+reverse('dependencia_list')
-    urls['cargo'] = 'http://'+get_current_site(request).domain+reverse('cargo_list')
+    urls['objeto_gasto'] = []
+    urls['objeto_gasto'].append('http://'+get_current_site(request).domain+reverse('objeto_gasto_list'))
+    urls['dependencia'] = []
+    urls['dependencia'].append('http://'+get_current_site(request).domain+reverse('dependencia_list'))
+    urls['cargo'] = []
+    urls['cargo'].append('http://'+get_current_site(request).domain+reverse('cargo_list'))
 
-    return JSONResponse(urls)
+    return render_to_response('home.html', context_instance=RequestContext(request, {'urls': urls}))
 
 @login_required
 def upload_file(request):

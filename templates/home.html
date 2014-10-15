@@ -1,8 +1,48 @@
 <html>
 <head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <title>file upload</title>
 </head>
 <body>
-<h3>Open Mec</h3>
+<div class="container">
+
+    <h2>Open Mec</h2>
+    <div class="row">
+        {% for key, values in urls.items %}
+
+            <h3>{{ key | upper }}</h3>
+            <p>
+                {% if key == 'funcionario' %}
+                    <b>Lista de funcionarios con paginaci&oacute;n</b><br><br>
+                    Parametros:
+                    <lu>
+                        <li>
+                            page = {numero de pagina : numero}
+                        </li>
+                        <li>
+                            size = {cantidad por pagina : numero}
+                        </li>
+                        <li>
+                            documento = {numero de documento : cadena}
+                        </li>
+                        <li>
+                            nombre = {nombre del funcionario : cadena}
+                        </li>
+                    </lu>
+                {% else %}
+                    <b>Lista de {{ key | lower }}s</b>
+                    <br><br>
+                    Parametros:
+                    <br> (Sin parametros)
+                {% endif %}
+            </p>
+            {% for value in values %}
+                <a style="width: 100%"  href="{{ value }}">{{ value }}</a><br>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+</div>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </body>
 </html>
