@@ -111,18 +111,16 @@ def cargo_list(request):
     return JSONResponse(serializer.data)
 
 
-def rubro_list(request, anio, mes):
+def rubro_list(request):
 
-    mes = next(value for value, name in MES if name == mes)
-    rubro = Rubro.objects.all().filter(anio=anio, mes=mes)
+    rubro = Rubro.objects.all()
     serializer = RubroSerializer(rubro, many=True)
     return JSONResponse(serializer.data)
 
 
-def concepto_list(request, anio, mes):
+def concepto_list(request):
 
-    mes = next(value for value, name in MES if name == mes)
-    concepto = Concepto.objects.all().filter(anio=anio, mes=mes)
+    concepto = Concepto.objects.all()
     serializer = ConceptoSerializer(concepto, many=True)
     return JSONResponse(serializer.data)
 

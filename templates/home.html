@@ -1,48 +1,172 @@
 <html>
 <head>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-    <title>file upload</title>
+    <title>Open Mec API</title>
+    <style>
+        body{
+            background-color: #e8e8e8;
+        }
+        .api-description{
+            background-color: white;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 10px 10px 5px #888888;
+            border: 10px black;
+        }
+        h2{
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
+<div class="container api-description">
+<div class="row">
+    <h2>Servicio Open Mec <div style="display: inline-block; font-size: 7pt; margin-top: -10px" class="label label-primary">ALPHA</div></h2>
+    <h3 class="lead">Descripcion del servicio</h3>
 
-    <h2>Open Mec</h2>
+    <p>
+        El Ministerio de Educación y Cultura en su portal de datos abiertos provee entre otras cosas un listado
+        de todos los funcionarios docentes, su asignación salarial y la especificación del rubro, la cantidad
+        de horas, la institución y otros datos.
+    </p>
+
+    <p>
+        Este listado Nómina de funcionarios docentes está construido por mes y año, y se publica desde junio de 2014,
+        por lo tanto hasta ahora hay 3 DataSets publicados, el listado tabular provee una visualización de esto, pero
+        ademas se publican ficheros PDF de estos listados y el fichero CSV del último mes publicado.
+    </p>
+
+    <h3 class="lead">El objetivo</h3>
+    <p>
+        El objetivo de este servicio es proveer una API que facilite la obtenci&oacute;n de estos datos, para su
+        posterior procesado.
+    </p>
+
+</div>
     <div class="row">
         {% for key, values in urls.items %}
-
-            <h3>{{ key | upper }}</h3>
+            <hr>
+            <h3 id="{{ key }}">{{ key | upper }}</h3>
             <p>
                 {% if key == 'funcionario' %}
                     <b>Lista de funcionarios con paginaci&oacute;n</b><br><br>
-                    Parametros:
-                    <lu>
+                    <h4>Parametros:</h4>
+                    <ul>
                         <li>
-                            page = {numero de pagina : numero}
+                            <b>page</b>: < numero de pagina : integer > (opcional)
                         </li>
                         <li>
-                            size = {cantidad por pagina : numero}
+                            <b>size</b>: < cantidad por pagina : integer > (opcional)
                         </li>
                         <li>
-                            documento = {numero de documento : cadena}
+                            <b>documento</b>: < numero de documento : string >(opcional)
                         </li>
                         <li>
-                            nombre = {nombre del funcionario : cadena}
+                            <b>nombre</b>: < nombre del funcionario : string > (opcional)
                         </li>
-                    </lu>
+                    </ul>
                 {% else %}
                     <b>Lista de {{ key | lower }}s</b>
                     <br><br>
-                    Parametros:
-                    <br> (Sin parametros)
+                    <h4>Parametros:</h4>
+                    (Sin parametros)
                 {% endif %}
             </p>
             {% for value in values %}
-                <a style="width: 100%"  href="{{ value }}">{{ value }}</a><br>
+                <div class="label label-success">GET</div>&nbsp;&nbsp;<a style="width: 100%"  href="{{ value }}">{{ value }}</a><br>
             {% endfor %}
+
+            <h4>Salida:</h4>
+            <pre style="color:lightcoral"><div class="pull-left label label-default">JSON</div>{% if key == 'funcionario' %}
+                {
+                    "count": < Numero total de entradas : integer>,
+                    "next": < URL de la p&aacute;gina siguiente : url >,
+                    "previous": < URL de la p&aacute;gina anterior : url >,
+                    "results":
+                    [
+                        {
+                            "documento": "< Documento de identidad : string >",
+                            "funcionario": "< Nombre y apellido del funcionario : string>",
+                            "nro_matriculacion": < Numero de matricula : integer >,
+                            "datos": [
+                                {
+                                    "id": < Codigo identificador de la entrada : integer >,
+                                    "mes": < Numero de mes : integer >,
+                                    "anio": < Numero de año : integer>,
+                                    "estado": "< Estado del funcionario : string>",
+                                    "objeto_gasto": {
+                                        "codigo": "< Codigo de objeto gasto : string >",
+                                        "nombre": "< Nombre de objeto gasto : string >"
+                                    },
+                                    "concepto": {
+                                        "concepto": "< Nombre de concepto : string >"
+                                    },
+                                    "dependencia": {
+                                        "institucion": "< Nombre de la institucion : string >"
+                                    },
+                                    "cargo": {
+                                        "cargo": "< Nombre del cargo : string >"
+                                    },
+                                    "rubro": {
+                                        "codigo": "< Nombre del rubro : integer >",
+                                        "monto": < Monto del rubro : integer >
+                                    }
+                                },
+                                ...
+                            ]
+                        },
+                        ...
+                    ]
+                }
+            {% elif key == 'cargo' %}
+                [
+                    { "cargo": "< Nombre de cargo : string>"},
+                    ...
+                ]
+            {% elif key == 'concepto' %}
+                [
+                    {
+                        "concepto": "< Nombre de concepto : string >"
+                    },
+                    ...
+                ]
+            {% elif key == 'objeto_gasto' %}
+                [
+                    {
+                        "codigo": "< Codigo de objeto gasto : string >",
+                        "nombre": "< Nombre de objeto gasto : string >"
+                    },
+                    ...
+                ]
+            {% elif key == 'dependencia' %}
+                [
+                    {
+                        "institucion": "< Nombre de Institucion : string >"},
+                    },
+                    ...
+                ]
+            {% elif key == 'rubro' %}
+                [
+                    {
+                        "codigo": "< Codigo de rubro : string >",
+                        "monto": < Monto de rubro : integer >},
+                    },
+                    ...
+                ]
+            {% endif %}</pre>
         {% endfor %}
     </div>
 
 </div>
+<br>
+<footer>
+    <pre>
+                <img src="http://opendata.pol.una.py/wp-content/uploads/2014/10/od-logo.png" width="130px" /> <span><label>     Autor:</label> Julio Reyes &lt;<a href="mailto:nemesiscodex@gmail.com">nemesiscodex@gmail.com</a>&gt;</span> <span class="pull-right" style="margin-right: 80px"><label>Codigo Fuente:</label><a href="https://github.com/nemesiscodex/openmec"> Github</a></span>
+
+                <span style="font-size: 8pt;color: #fe897e">&bigstar; Los datos proveidos en este servicio no son fiables puesto que la aplicacion esta en fase de pruebas y puede ser inestable. Para su utilizacion en proyectos reales por favor utilize la <a href="http://datos.mec.gov.py/data/nomina_docentes">fuente original</a> de los datos</span>
+    </pre>
+</footer>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </body>
 </html>
